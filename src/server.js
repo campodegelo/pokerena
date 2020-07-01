@@ -315,6 +315,26 @@ app.post('/increment', (req, res) => {
   }).catch(err => console.log('error in updateValues : ', err));
 });
 
+// POST - finish a tournament
+app.post('/finishTournament', (req, res) => {
+  const {tournamentId} = req.body;
+  db.finishTournament(tournamentId).then(data => {
+    console.log('tournament ended');
+    res.json({
+      success: true
+    });
+  }).catch(err => console.log('error in /finishTournament : ', err));
+});
+
+// POST - get the total of buyIn and addon
+app.post('/getTotalPrize', (req, res) => {
+  const {tournamentId} = req.body;
+  db.getTotal(tournamentId).then(data => {
+    console.log('data from /getTotal ', data);
+    res.json(data);
+  }).catch(err => console.log('error in /getTotalPrize : ', err));
+})
+
 server.listen(process.env.PORT || 8080, () => {
   console.log("Listening...");
 });

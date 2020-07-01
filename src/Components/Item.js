@@ -4,7 +4,7 @@ import Window from './Window';
 import Increment from './Increment';
 import ITEM_TYPE from '../utils/Items';
 
-const Item = ({item, index, moveItem, status, tournamentId}) => {
+const Item = ({item, index, moveItem, status, tournamentId, updatePrize}) => {
 
     // console.log('item = ', item);
     const ref = useRef(null);
@@ -83,6 +83,7 @@ const Item = ({item, index, moveItem, status, tournamentId}) => {
                         <Increment
                           userId={item.id}
                             tournamentId={tournamentId}
+                            updatePrize={updatePrize}
                         ></Increment>
                 )}
             </div>

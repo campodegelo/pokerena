@@ -1,51 +1,22 @@
-// import React, { useEffect } from "react";
-// import { BrowserRouter, HashRouter, Link, Route } from "react-router-dom";
-// import Board from './Board';
-// import Player from './Player';
-// import Item from './Item';
-// import Col from './Col';
-// import {data, statuses} from '../data';
-// import DropWrapper from './DropWrapper';
-// import Homepage from './Homepage';
-
-// import axios from "../scripts/axios";
-
-// export default class StartGame extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {};
-//     }
-
-//     render () {
-        // return (
-        //     <BrowserRouter>
-        //           <div className="main__text-box">
-        //               <h1 className="heading-primary">
-        //                   <span className="heading-primary--main">Novo Torneio</span>
-        //               </h1>
-        //           </div>
-
-                
-
-        //         <Homepage></Homepage>
-
-        //     </BrowserRouter>
-        //   );
-    // }
-// }
-
 import React, {useState, useEffect, Fragment} from "react";
 import Item from './Item';
 import DropWrapper from './DropWrapper';
 import Col from './Col';
 import {statuses} from '../data/index';
 import axios from '../scripts/axios';
-import { finishTournament } from "../scripts/db";
 
-const Homepage = () => {
+const StartGame = () => {
 
     const [items, setItems] = useState(null);
     const [tournamentId, setTournamentId] = useState(null);
+    const [totalPrize, setTotalPrize] = useState(null);
+
+    const finishTournament = (tournamentId) => {
+        (async () => {
+            const {data} = await axios.post('/finishTournament', {tournamentId});
+            console.log(data);
+        })();
+    }
 
     useEffect(() => {
         (async() => {
@@ -64,8 +35,14 @@ const Homepage = () => {
                 });
                 setItems(players.data);
             } else {
+                // a tournament was not concluded
                 console.log('tournament happening');
                 setTournamentId(data[0].tournament_id);
+                const total = await axios.post('/getTotalPrize', {
+                    tournamentId: data[0].tournament_id
+                });
+                console.log('total = ', total.data[0]);
+                setTotalPrize(total.data[0].sum * total.data[0].value_entry);
                 players.data.forEach(element => {
                     element.status = 'jogadores';
                     if(element.image === null) {
@@ -93,7 +70,6 @@ const Homepage = () => {
     console.log('tournamentId = ', tournamentId);
 
     const onDrop = (item, monitor, status) => {
-        //const mapping = statuses.find(si => si.status === status);
 
         
         setItems(prevState => {
@@ -158,6 +134,10 @@ const Homepage = () => {
         })
     }
 
+    const updatePrize = () => {
+
+    }
+
     return (
         <Fragment>
             <div className="main__text-box">
@@ -170,14 +150,17 @@ const Homepage = () => {
                     return (
                         <div key={s.status} className={"col__wrapper"}>
                             <h2 className={"col__header"}>{s.status.toUpperCase()}</h2>
-                            {/* {s.status === 'torneio' && (
-                                <button className='btn btn--white increment__btn' onClick={() => finishTournament()}>encerrar</button>
-                            )} */}
+                                    {s.status === 'torneio' && (
+                                        <div className="col__values">
+                                            <p className="col__paragraph">Total Acumulado: {totalPrize}</p>
+                                            <button className='btn btn--white increment__btn' onClick={() => finishTournament(tournamentId)}>encerrar</button>
+                                        </div>  
+                                    )}
                             <DropWrapper onDrop={onDrop} status={s.status}>
                                 <Col>
                                     {items && items
                                         .filter(i => i.status === s.status)
-                                        .map((i, idx) => <Item key={i.id} item={i} index={idx} moveItem={moveItem} status={s} tournamentId={tournamentId}></Item>)}
+                                        .map((i, idx) => <Item key={i.id} item={i} index={idx} moveItem={moveItem} status={s} updatePrize={(prize) => setTotalPrize(prize)} tournamentId={tournamentId}></Item>)}
                                 </Col>
                             </DropWrapper>
                         </div>
@@ -188,6 +171,4 @@ const Homepage = () => {
     )
 }
 
-export default Homepage;
-
-
+export default StartGame;

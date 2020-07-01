@@ -49,7 +49,9 @@ exports.updatePicture = (id, imageUrl) => {
 
 // Return all the information of the registered players
 exports.allPlayers = () => {
-  return db.query(`SELECT * from users`).then(({rows})=> rows);
+  return db.query(
+    `SELECT *
+   from users`).then(({rows})=> rows);
 }
 
 // Get a tournament that was not finished
@@ -136,4 +138,26 @@ exports.updateValues = (userId, tournamentId, buyin, addon, prize) => {
     WHERE player_id = $1 AND tournament_id = $2
     RETURNING player_id
   `,[userId, tournamentId, buyin, addon, prize]).then((rows) => rows);
+}
+
+// update the status of the tournament
+exports.finishTournament = (tournamentId) => {
+  return db.query(`
+    UPDATE tournaments
+    SET finished = true
+    WHERE id = $1
+  `,[tournamentId]).then(({rows}) => rows);
+}
+
+// get the total of buyin and addon
+exports.getTotal = (tournamentId) => {
+  return db.query(
+    `SELECT tournament_id, value_entry, SUM(buyin + addon)  
+    FROM ranking 
+    JOIN tournaments 
+    ON tournaments.id = tournament_id 
+    WHERE tournament_id = $1
+    GROUP BY tournament_id, value_entry`,
+    [tournamentId]
+  ).then(({rows}) => rows);
 }

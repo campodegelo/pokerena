@@ -3,8 +3,9 @@ import { useStatefulFields } from "../Hooks/useStatefulFields";
 // import { useAuthSumbit } from "../Hooks/useAuthSubmit";
 import axios from '../scripts/axios';
 
-const Increment = ({userId, tournamentId}) => {
+const Increment = ({userId, tournamentId, updatePrize}) => {
     const [values, handleChange] = useStatefulFields();
+    // const [totalPrize, setTotalPrize] = useState(null);
     // const [error, loading, handleSubmit] = useAuthSumbit("/increment", values);
     const [editBtn, setEditBtn] = useState(false);
     const [buyin, setBuyin] = useState();
@@ -26,6 +27,8 @@ const Increment = ({userId, tournamentId}) => {
             const {data} = await axios.post('/increment', {
                 userId, tournamentId, values
             });
+            const totalPrize = await axios.post('/getTotalPrize', {tournamentId});
+            updatePrize(totalPrize.data[0].sum * totalPrize.data[0].value_entry);
             console.log('data from /increment ', data);
         })();
     }
@@ -33,15 +36,17 @@ const Increment = ({userId, tournamentId}) => {
     useEffect(() => {
         (async () => {
             // needs to wait otherwise a select in the DB is made before the register is there
-            await new Promise(resolve => setTimeout(resolve, 600));
+            await new Promise(resolve => setTimeout(resolve, 2000));
             console.log(userId, tournamentId);
             const {data} = await axios.post('/searchBA', {userId, tournamentId});
+            // await new Promise(resolve => setTimeout(resolve, 500));
             console.log('user: ', userId);
             console.log('tournament: ', tournamentId);
             console.log('data from searchBA = ', data);
             setBuyin(data[0].buyin);
             setAddon(data[0].addon);
             setPrize(data[0].prize);
+
         })();
     },[]);
 

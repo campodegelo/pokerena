@@ -36,24 +36,6 @@ export default class App extends React.Component {
     })();
 }
 
-  // drop(e) {
-  //   e.preventDefault();
-  //   const playerId = e.dataTransfer.getData('player__id');
-
-  //   const player = document.getElementById(playerId);
-  //   console.log('player = ', player);
-    
-  //   player.style.display = 'block'; 
-
-  //   console.log('e.target = ', e.target);
-
-  //   // e.target.appendChild(player);
-  // }
-
-  // dragOver(e) {
-  //   e.preventDefault();
-  // }
-
   render() {
     return (
       <BrowserRouter>
