@@ -1,0 +1,44 @@
+.item {
+
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 5px;
+    z-index: 1;
+    background-color: $color-white;
+    position: relative;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    &__title {
+        font-weight: 600;
+        font-size: 2rem;
+    }
+
+    &__status {
+        text-align: right;
+        position: absolute;
+        right: 1rem;
+        height: 4rem;
+        top: 1rem;
+    }
+
+    &__bar {
+        width: 5rem;
+        height: 1rem;
+        border-radius: 5px;
+    }
+
+    &__dropzone {
+        flex: 1 25%;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__highlight {
+        background-color: $color-primary;
+    }
+
+}

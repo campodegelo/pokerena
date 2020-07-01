@@ -1,0 +1,29 @@
+.col {
+
+    min-height: 300px;
+    max-width: 300px;
+    width: 300px;
+
+    &__wrapper {
+        display: flex;
+    flex-direction: column;
+    margin: 3rem;
+    padding: 3rem;
+    background-color: $color-black;
+    border-radius: 30px;
+    border: 1px solid $color-white;
+
+    }
+
+    &__header {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        margin-top: 0;
+        color: $color-white;
+        background-color: $color-primary;
+        text-align: center;
+    }
+
+
+}
