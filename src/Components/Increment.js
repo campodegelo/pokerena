@@ -8,9 +8,9 @@ const Increment = ({userId, tournamentId, updatePrize}) => {
     // const [totalPrize, setTotalPrize] = useState(null);
     // const [error, loading, handleSubmit] = useAuthSumbit("/increment", values);
     const [editBtn, setEditBtn] = useState(false);
-    const [buyin, setBuyin] = useState();
-    const [addon, setAddon] = useState();
-    const [prize, setPrize] = useState();
+    const [buyin, setBuyin] = useState(1);
+    const [addon, setAddon] = useState(0);
+    const [prize, setPrize] = useState(0);
 
     const handleSubmit = () => {
         (async () => {
@@ -36,16 +36,18 @@ const Increment = ({userId, tournamentId, updatePrize}) => {
     useEffect(() => {
         (async () => {
             // needs to wait otherwise a select in the DB is made before the register is there
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            //await new Promise(resolve => setTimeout(resolve, 500));
             console.log(userId, tournamentId);
             const {data} = await axios.post('/searchBA', {userId, tournamentId});
             // await new Promise(resolve => setTimeout(resolve, 500));
             console.log('user: ', userId);
             console.log('tournament: ', tournamentId);
             console.log('data from searchBA = ', data);
-            setBuyin(data[0].buyin);
-            setAddon(data[0].addon);
-            setPrize(data[0].prize);
+            if (data.length !== 0) {
+                setBuyin(data[0].buyin);
+                setAddon(data[0].addon);
+                setPrize(data[0].prize);
+            } 
 
         })();
     },[]);
