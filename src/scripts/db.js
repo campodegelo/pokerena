@@ -57,7 +57,7 @@ exports.allPlayers = () => {
 // Get a tournament that was not finished
 exports.findOnGoingTournament = () => {
   return db.query(`
-    SELECT player_id as id, buyin, addon, date_tournament, tournament_id, value_entry 
+    SELECT player_id as id, buyin, addon, day, month, tournament_id, value_entry 
     FROM tournaments
     JOIN ranking
     ON tournaments.id = ranking.tournament_id
@@ -66,12 +66,12 @@ exports.findOnGoingTournament = () => {
 };
 
 // Insert a new tournament in the DB
-exports.newTournament = (date, value) => {
+exports.newTournament = (day, month, value) => {
   return db.query(`
-    INSERT INTO tournaments (date_tournament, value_entry)
-    VALUES ($1, $2)
+    INSERT INTO tournaments (day, month, value_entry)
+    VALUES ($1, $2, $3)
     RETURNING id`,
-    [date, value]
+    [day, month, value]
     ).then(({rows}) => rows);
 };
 
@@ -160,4 +160,23 @@ exports.getTotal = (tournamentId) => {
     GROUP BY tournament_id, value_entry`,
     [tournamentId]
   ).then(({rows}) => rows);
+}
+
+// get months when games where played
+exports.getMonthsPlayed = () => {
+  return db.query(`
+    SELECT DISTINCT month
+    FROM tournaments
+  `).then(({rows}) => rows);
+}
+
+// get the tournaments played in a specific Month
+exports.getMonthInfo = (month) => {
+  return db.query(
+    `SELECT * 
+    FROM tournaments
+    JOIN ranking
+    ON tournaments.id = tournament_id
+    WHERE month = $1
+  `,[month]).then(({rows}) => rows)
 }

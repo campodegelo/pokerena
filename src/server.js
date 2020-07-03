@@ -247,8 +247,8 @@ app.get('/findOnGoingTournament', (req, res) => {
 // POST - Create a new Tournament
 app.post('/newTournament', (req, res) => {
   console.log('req.body = ', req.body);
-  const {currentDate, value, playerId} = req.body;
-  db.newTournament(currentDate, value).then(data => {
+  const {day, month, value, playerId} = req.body;
+  db.newTournament(day, month, value).then(data => {
     console.log('data from newTournament = ', data);
     // res.json(data);
 
@@ -333,7 +333,30 @@ app.post('/getTotalPrize', (req, res) => {
     console.log('data from /getTotal ', data);
     res.json(data);
   }).catch(err => console.log('error in /getTotalPrize : ', err));
-})
+});
+
+// GET - get information of the months where games happened 
+app.get('/getMonthsPlayed', (req, res) => {
+  db.getMonthsPlayed().then(data => {
+    if (data.lenght === 0) {
+      res.json({
+        success: false
+      })
+    } else {
+      res.json({
+        success: true,
+        data});
+    }
+  })
+});
+
+// GET - get the information of a correspondent month clicked
+app.get('/getMonthInfo/:id', (req, res) => {
+  db.getMonthInfo(req.params.id).then(data => {
+    console.log('data from /getMonthInfo : ', data);
+  }).catch(err => console.log('error in /getMonthInfo : ', err))
+});
+
 
 server.listen(process.env.PORT || 8080, () => {
   console.log("Listening...");

@@ -10,11 +10,32 @@ const StartGame = () => {
     const [items, setItems] = useState(null);
     const [tournamentId, setTournamentId] = useState(null);
     const [totalPrize, setTotalPrize] = useState(null);
+    const [value, setValue] = useState(10);
 
     const finishTournament = (tournamentId) => {
         (async () => {
             const {data} = await axios.post('/finishTournament', {tournamentId});
             console.log(data);
+
+            // set all players back to the initial stage and tournament id to null
+            setTournamentId(null);
+            setTotalPrize(0);
+            changePlayerStatus('jogadores');
+
+        })();
+    }
+
+    const changePlayerStatus = (status) => {
+        (async () => {
+            const {data} = await axios.get('/allPlayers');
+            data.forEach(player => {
+                player.status = status;
+                if(player.image === null) {
+                    player.image = "/img/default.png"
+                }
+            });
+            setItems(data);
+
         })();
     }
 
@@ -23,17 +44,18 @@ const StartGame = () => {
             const {data} = await axios.get('/findOnGoingTournament');
             const players = await axios.get('/allPlayers');
             console.log('tournament going on = ', data);
-            console.log("info about users = ", players.data);
+            // console.log("info about users = ", players.data);
 
             // no tournaments unfinished  
             if(data.length === 0) {
-                players.data.forEach(element => {
-                    element.status = 'jogadores';
-                    if(element.image === null) {
-                        element.image = "/img/default.png"
-                    }
-                });
-                setItems(players.data);
+                // players.data.forEach(element => {
+                //     element.status = 'jogadores';
+                //     if(element.image === null) {
+                //         element.image = "/img/default.png"
+                //     }
+                // });
+                // setItems(players.data);
+                changePlayerStatus('jogadores');
             } else {
                 // a tournament was not concluded
                 console.log('tournament happening');
@@ -64,7 +86,6 @@ const StartGame = () => {
 
 
     }, []);
-    
 
     console.log('items = ', items);
     console.log('tournamentId = ', tournamentId);
@@ -85,11 +106,15 @@ const StartGame = () => {
                     // a new tournament will be created
                     (async () => {
                         console.log('a new tournament will be created');
-                        const currentDate = new Date().getDate() + '-' + new Date().getMonth();
-                        const value = 10;
-                        const newTournament = await axios.post('/newTournament', {currentDate, value, playerId});
+                        const currentDate = new Date().getDate() + '-' + (new Date().getMonth() + 1);
+                        // const value = 10;
+                        const day = new Date().getDate();
+                        const month = new Date().getMonth() + 1;
+                        const newTournament = await axios.post('/newTournament', {day, month, value, playerId});
                         console.log('new tournament created = ', newTournament.data);
                         setTournamentId(newTournament.data[0].tournament_id);
+
+                        setTotalPrize(totalPrize + value);
                     })();
                 } else {
                     // an open tournament is found
@@ -99,6 +124,10 @@ const StartGame = () => {
                         const {data} = await axios.post('/joinPlayer', {
                             playerId, tournamentId
                         });
+
+                        // update the total of prize when a user is inserted
+                        setTotalPrize(totalPrize + value);
+
                         console.log('player inserted = ', data);
                     })();
 
@@ -113,8 +142,15 @@ const StartGame = () => {
                         playerId, tournamentId
                     });
                     console.log('user has been removed: ', data);
+
+                    // remove the tournament if there is no player enrolled
                     if (data.delete) {
                         setTournamentId(null);
+                        setTotalPrize(0);
+                    } else {
+                        // update the total of prize when a user is removed
+                        const {data} = await axios.post('/getTotalPrize', {tournamentId});
+                        setTotalPrize(data[0].sum * data[0].value_entry);
                     }
 
                 })();
@@ -134,9 +170,9 @@ const StartGame = () => {
         })
     }
 
-    const updatePrize = () => {
+    // const updatePrize = () => {
 
-    }
+    // }
 
     return (
         <Fragment>
